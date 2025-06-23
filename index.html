@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Responsive Calculator</title>
+  <style>
+    :root {
+      --bg: #f9fafb;
+      --screen-bg: #ffffff;
+      --text-main: #111827;
+      --text-secondary: #6b7280;
+      --btn-number-bg: #e5e7eb;
+      --btn-func-bg: #d1d5db;
+      --btn-op-bg: #3b82f6;
+      --btn-eq-bg: #10b981;
+      --btn-shadow: rgba(0, 0, 0, 0.15);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --screen-bg: #1e293b;
+      --text-main: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --btn-number-bg: #334155;
+      --btn-func-bg: #475569;
+      --btn-op-bg: #2563eb;
+      --btn-eq-bg: #22c55e;
+      --btn-shadow: rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .theme-toggle label {
+      width: 50px;
+      height: 26px;
+      background: var(--btn-func-bg);
+      border-radius: 9999px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .theme-toggle input {
+      display: none;
+    }
+
+    .theme-toggle label::after {
+      content: '';
+      width: 22px;
+      height: 22px;
+      background: var(--btn-number-bg);
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s ease;
+    }
+
+    input:checked + label::after {
+      transform: translateX(24px);
+    }
+
+    .calculator {
+      width: 100%;
+      max-width: 420px;
+      background: var(--screen-bg);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px var(--btn-shadow);
+      overflow: hidden;
+    }
+
+    .screen {
+      padding: 1.5rem 1rem;
+      text-align: right;
+      font-size: 2.75rem;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .history {
+      position: absolute;
+      top: 0.5rem;
+      left: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 1rem;
+    }
+
+    button {
+      font-size: 1.5rem;
+      padding: 1.25rem;
+      border: none;
+      border-radius: 12px;
+      background: var(--btn-number-bg);
+      color: var(--text-main);
+      box-shadow: 0 4px 6px var(--btn-shadow);
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+    }
+
+    button:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 3px var(--btn-shadow);
+    }
+
+    .btn-func {
+      background: var(--btn-func-bg);
+    }
+
+    .btn-op {
+      background: var(--btn-op-bg);
+      color: #fff;
+    }
+
+    .btn-eq {
+      background: var(--btn-eq-bg);
+      color: #fff;
+    }
+
+    .btn-zero {
+      grid-column: span 2;
+      text-align: left;
+      padding-left: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .screen {
+        font-size: 2.25rem;
+        padding: 1rem;
+      }
+
+      button {
+        font-size: 1.25rem;
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body data-theme="light">
+
+  <!-- Theme Toggle -->
+  <div class="theme-toggle">
+    <span>☀</span>
+    <input type="checkbox" id="toggle">
+    <label for="toggle"></label>
+    <span>🌙</span>
+  </div>
+
+  <!-- Calculator Container -->
+  <div class="calculator">
+    <div class="screen">
+      <div class="history" id="history"></div>
+      <div id="display">0</div>
+    </div>
+    <div class="buttons">
+      <button class="btn-func" data-action="clear">C</button>
+      <button class="btn-func" data-action="plus-minus">±</button>
+      <button class="btn-func" data-action="percent">%</button>
+      <button class="btn-op" data-action="divide">÷</button>
+
+      <button data-digit="7">7</button>
+      <button data-digit="8">8</button>
+      <button data-digit="9">9</button>
+      <button class="btn-op" data-action="multiply">×</button>
+
+      <button data-digit="4">4</button>
+      <button data-digit="5">5</button>
+      <button data-digit="6">6</button>
+      <button class="btn-op" data-action="subtract">−</button>
+
+      <button data-digit="1">1</button>
+      <button data-digit="2">2</button>
+      <button data-digit="3">3</button>
+      <button class="btn-eq" data-action="equals">=</button>
+
+      <button class="btn-zero" data-digit="0">0</button>
+      <button data-digit=".">.</button>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('toggle');
+    toggle.addEventListener('change', () => {
+      document.body.dataset.theme = toggle.checked ? 'dark' : 'light';
+    });
+
+    const display = document.getElementById('display');
+    const historyEl = document.getElementById('history');
+    let current = '';
+    let previous = '';
+    let operation = null;
+
+    function updateDisplay() {
+      display.textContent = current || '0';
+      historyEl.textContent = previous + (operation ? ` ${operation}` : '');
+    }
+
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.dataset.digit !== undefined) {
+          current += btn.dataset.digit;
+        } else {
+          const action = btn.dataset.action;
+          if (action === 'clear') {
+            current = ''; previous = ''; operation = null;
+          } else if (action === 'plus-minus') {
+            current = current.startsWith('-') ? current.slice(1) : '-' + current;
+          } else if (action === 'percent') {
+            current = (parseFloat(current) / 100).toString();
+          } else if (action === 'equals') {
+            if (!operation) return;
+            try {
+              const exp = `${previous}${operation}${current}`;
+              current = eval(exp).toString();
+              previous = '';
+              operation = null;
+            } catch {
+              current = 'Error';
+            }
+          } else {
+            operation = { add: '+', subtract: '-', multiply: '*', divide: '/' }[action];
+            previous = current;
+            current = '';
+          }
+        }
+        updateDisplay();
+      });
+    });
+
+    updateDisplay();
+  </script>
+</body>
+</html>
