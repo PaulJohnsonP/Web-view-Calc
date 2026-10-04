@@ -251,7 +251,17 @@
             current = '';
           }
         }
+       // Initialize the calculator display
         updateDisplay();
+        
+        // Add basic keyboard shortcuts
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === '=') {
+            document.querySelector('[data-action="equals"]').click();
+          } else if (event.key === 'Escape') {
+            document.querySelector('[data-action="clear"]').click();
+          }
+        });
       });
     });
 
